@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-send-service
+  namespace: aml-forte
+  labels:
+    app: auto-send-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auto-send-service
+  template:
+    metadata:
+      labels:
+        app: auto-send-service
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: auto-send-service
+          image: IMAGE_PLACEHOLDER
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://10.207.22.4:5432/adviser
+            - name: DB_USERNAME
+              value: aml
+            - name: DB_PASSWORD
+              value: aml
+
+            - name: VALIDATION_SERVICE_URL
+              value: http://forte-slk-service:8193/
+            - name: SLK_SERVICE_URL
+              value: http://aml-slk:8080/api/slk/v1/
+
+            - name: SCHEDULER_ENABLED
+              value: "true"
+            - name: SCHEDULE_CRON
+              value: "0 30 9 * * MON-FRI"
+            - name: SCHEDULE_ZONE
+              value: Asia/Qyzylorda
+
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+
+            - name: LOGGING_LEVEL_ROOT
+              value: INFO
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auto-send-service
+  namespace: aml-forte
+  labels:
+    app: auto-send-service
+spec:
+  selector:
+    app: auto-send-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
