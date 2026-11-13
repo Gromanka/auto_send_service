@@ -24,20 +24,22 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: DB_URL
+            - name: POSTGRES_URL
               value: jdbc:postgresql://10.207.22.4:5432/adviser
-            - name: DB_USERNAME
+            - name: POSTGRES_USERNAME
               value: aml
-            - name: DB_PASSWORD
+            - name: POSTGRES_PASSWORD
               value: aml
+            - name: POSTGRES_DRIVER
+              value: org.postgresql.Driver
 
             - name: VALIDATION_SERVICE_URL
-              value: http://forte-slk-service:8193/
+              value: http://forte-slk-service:8193
             - name: SLK_SERVICE_URL
-              value: http://aml-slk:8080/api/slk/v1/
+              value: http://aml-slk:8080/api/slk/v1
 
             - name: SCHEDULER_ENABLED
-              value: "true"
+              value: "false"
             - name: SCHEDULE_CRON
               value: "0 30 9 * * MON-FRI"
             - name: SCHEDULE_ZONE

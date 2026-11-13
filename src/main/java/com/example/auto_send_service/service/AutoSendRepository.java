@@ -18,13 +18,24 @@ public class AutoSendRepository {
 
     public List<AutoSendSuspOperDto> findActiveConfigs() {
         return jdbc.query("""
-                SELECT p_suspicioustypecode, p_operationstatus, active,
-                       start_date, end_date, p_username
-                FROM public.tb_auto_send_susp_oper
-                WHERE active = 1
-                  AND CURRENT_DATE BETWEEN start_date AND end_date
-                """,
-                BeanPropertyRowMapper.newInstance(AutoSendSuspOperDto.class));
+            SELECT p_suspicioustypecode, p_operationstatus, active, start_date, end_date, p_username
+              FROM public.tb_auto_send_susp_oper
+             WHERE active = 1
+               AND CURRENT_DATE BETWEEN start_date AND end_date
+            """,
+                (rs, rowNum) -> {
+                    AutoSendSuspOperDto dto = new AutoSendSuspOperDto();
+
+                    dto.setPSuspiciousTypeCode(rs.getInt("p_suspicioustypecode"));
+                    dto.setPOperationStatus(rs.getInt("p_operationstatus"));
+                    dto.setActive(rs.getInt("active"));
+
+                    dto.setStartDate(rs.getObject("start_date", LocalDate.class));
+                    dto.setEndDate(rs.getObject("end_date", LocalDate.class));
+                    dto.setPUsername(rs.getString("p_username"));
+
+                    return dto;
+                });
     }
 
     public List<Long> findSuspiciousOperationIds(Integer typeCode, Integer status) {
